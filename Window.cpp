@@ -1,9 +1,8 @@
 
 #include "Window.h"
-#include <iostream>
 
 
-Window* window = nullptr;
+//Window* window = nullptr;
 
 
 Window::Window()
@@ -14,14 +13,26 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	switch (msg)
 	{
-	case WM_CREATE:
+	case WM_CREATE: 
+	{
+		//window->onCreate();
+				// Event fired when the window is created
+		Window* window = (Window*)((LPCREATESTRUCT)lparam)->lpCreateParams;
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)window);
 		window->onCreate();
 		break;
+	}
+		
 		
 	case WM_DESTROY:
+	{
+		//window->onDestroy();
+		Window* window = (Window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 		window->onDestroy();
 		::PostQuitMessage(0);
 		break;
+	}
+		
 
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
@@ -37,9 +48,9 @@ Window::~Window()
 
 bool Window::init()
 {
+	//Setting up WNDCLASSEX object
 	WNDCLASSEX wc;
 	wc.cbClsExtra = NULL;
-	// wc.cbsi\ze = sizeof(WNDCLASSEX)
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.cbWndExtra = NULL;
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
@@ -52,14 +63,14 @@ bool Window::init()
 	wc.style = NULL;
 	wc.lpfnWndProc = &WndProc;
 
-	if (!window) window = this;
+	//if (!window) window = this;
 
 
 	if (!::RegisterClassEx(&wc)) return false;
 
 	// creation of the window
-	m_hwnd = ::CreateWindowExW(WS_EX_OVERLAPPEDWINDOW, L"MyWindowClass", L"DirectX Application", WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, NULL, NULL);
+	m_hwnd = ::CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"MyWindowClass", L"DirectX Application", WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, NULL, this);
 
 	if (!m_hwnd) return false;
 
@@ -89,9 +100,9 @@ bool Window::broadcast()
 		DispatchMessage(&msg);
 	}
 
-	window->onUpdate();
+	this->onUpdate();
 
-	Sleep(0);
+	Sleep(1);
 
 	return true;
 }
@@ -100,6 +111,14 @@ bool Window::isRun()
 {
 
 	return m_is_run;
+}
+
+void Window::onCreate()
+{
+}
+
+void Window::onUpdate()
+{
 }
 
 void Window::onDestroy()
