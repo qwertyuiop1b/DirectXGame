@@ -34,7 +34,7 @@
 /bin/
 /intermediate/
 .vs/
-
+x64/
 
 *.exe
 *.ilk

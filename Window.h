@@ -21,6 +21,9 @@ public:
 
 	bool isRun();
 
+	RECT getClientWindwoRect();
+	void setHWND(HWND hwnd);
+
 	virtual void onCreate();
 	virtual void onUpdate();
 	virtual void onDestroy();
